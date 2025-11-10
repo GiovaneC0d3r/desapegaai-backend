@@ -19,7 +19,7 @@ export class UserController {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      domain: process.env.URL_FRONTEND,
+      domain: 'apicoder.duckdns.org',
     });
     return {
       success: true,
