@@ -10,6 +10,7 @@ async function bootstrap() {
     credentials: true,
 
   })
+  console.log('Frontend URL:', process.env.URL_FRONTEND);
 
   app.useGlobalPipes(new ValidationPipe(
     
