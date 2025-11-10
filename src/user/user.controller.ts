@@ -1,5 +1,5 @@
 
-import { Req, Controller, Post, Body, HttpCode, HttpStatus, Res, UseGuards, Get  } from '@nestjs/common';
+import { Req, Controller, Post, Body, HttpCode, HttpStatus, Res, UseGuards, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginUserDto } from './dto/login-user-dto';
@@ -15,7 +15,12 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
   @Get('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('auth-cookie');
+    res.clearCookie('auth-cookie', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: process.env.URL_FRONTEND,
+    });
     return {
       success: true,
       message: 'Logout realizado com sucesso',
@@ -56,8 +61,8 @@ export class UserController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Req() req: AuthenticatedRequest){
-    return{
+  getProfile(@Req() req: AuthenticatedRequest) {
+    return {
       sucess: true,
       user: req.user,
     }
