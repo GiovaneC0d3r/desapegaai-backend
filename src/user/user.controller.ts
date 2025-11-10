@@ -45,7 +45,7 @@ export class UserController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3600000, // 1 hora
-      sameSite: 'lax',
+      sameSite: 'none',
     });
 
     return {
