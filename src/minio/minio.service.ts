@@ -22,6 +22,6 @@ export class MinioService {
     const filename = `${randomUUID()}${extname(file.originalname)}`;
     const objectName = `products/${filename}`;
     await this.client.putObject(bucket, objectName, file.buffer);
-    return { fileUrl: `http://${process.env.MINIO_ENDPOINT}:9000/${bucket}/${objectName}` };
+    return { fileUrl: `https://${process.env.MINIO_ENDPOINT}/${bucket}/${objectName}` };
   }
 }
