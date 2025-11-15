@@ -37,10 +37,19 @@ export class ProductsController {
     return this.productsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('files'))
+  @Patch('update/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: AuthenticatedRequest
+  ) {
+    const userId = req.user.id;
+    return this.productsService.update(id, updateProductDto, files, userId);
   }
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

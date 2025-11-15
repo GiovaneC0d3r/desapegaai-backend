@@ -59,9 +59,50 @@ export class ProductsService {
     return `This action returns a #${id} product`;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    productId: string,
+    updateProductDto: UpdateProductDto,
+    files: Express.Multer.File[],
+    userId: string
+  ): Promise<ProductEntity> {
+
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+      relations: ['user'],
+    });
+
+    if (!product) throw new Error('Produto não encontrado');
+    if (product.user.id !== userId) throw new Error('Não autorizado');
+
+    if (updateProductDto.description) {
+      product.description = updateProductDto.description;
+    }
+
+    if (updateProductDto.price) {
+      product.price = parsePriceToCents(updateProductDto.price);
+    }
+
+    const newMedias: string[] = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const { fileUrl } = await this.minioService.uploadProductFile(file);
+        newMedias.push(fileUrl);
+      }
+    }
+
+    product.medias = [...product.medias, ...newMedias];
+
+    if (updateProductDto.removeMedias && Array.isArray(updateProductDto.removeMedias)) {
+      product.medias = product.medias.filter(
+        (m) => !updateProductDto.removeMedias?.includes(m) 
+      );
+
+    }
+
+    return this.productRepository.save(product);
   }
+
 
   remove(id: number) {
     return `This action removes a #${id} product`;
